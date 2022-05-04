@@ -28,6 +28,11 @@ def menu_actions_distributor(message):
                          f"<b>Insert twitter usernames, separated by commas</b>",
                          parse_mode='html')
         bot.register_next_step_handler(message, add_accounts)
+    if message.text == 'Remove accounts':
+        bot.send_message(message.from_user.id,
+                         f"<b>Insert twitter usernames you want to stop tracking</b>",
+                         parse_mode='html')
+        bot.register_next_step_handler(message, remove_accounts)
     if message.text == 'Show accounts list':
         show_added_accounts(message)
 
@@ -42,7 +47,15 @@ def add_accounts(message):
         bot_users[message.from_user.id].get_users(user_input)
         for user in bot_users[message.from_user.id].users:
             bot_users[message.from_user.id].get_user_follows(user)
+    print(bot_users[message.from_user.id].users)
 
+
+def remove_accounts(message):
+    user_input = message.text.split(',')
+    normalize_input(user_input)
+    for user in bot_users[message.from_user.id].users:
+        if user.username in user_input:
+            bot_users[message.from_user.id].delete_user(user)
     print(bot_users[message.from_user.id].users)
 
 
@@ -53,3 +66,4 @@ def show_added_accounts(message):
 def normalize_input(user_input: list):
     for i in range(len(user_input)):
         user_input[i] = user_input[i].strip()
+

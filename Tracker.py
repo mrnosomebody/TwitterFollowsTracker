@@ -30,8 +30,6 @@ class Tracker:
         for user in self.users:
             self.get_user_follows(user)
 
-        self.usernames = usernames
-
     def get_users(self, usernames: list[str]) -> str:
         """
         We have to get users' ids by their usernames, because when we get
@@ -61,6 +59,16 @@ class Tracker:
         if username not in self.usernames:
             id_ = user['id']
             self.users.append(User(username, id_, []))
+            self.usernames.append(username)
+        else:
+            return
+
+    def delete_user(self, user: User):
+        print(self.usernames)
+        username = user.username
+        if username in self.usernames:
+            self.users.remove(user)
+            self.usernames.remove(username)
         else:
             return
 
