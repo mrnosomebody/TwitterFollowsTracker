@@ -9,7 +9,8 @@ get_users_url = "https://api.twitter.com/2/users/by?usernames="
 class User:
     username: str
     id: str
-    follows: list
+    follows: list[dict[str, str]]
+    follows_usernames: list[str]
 
     def get_follows(self):
         return self.follows
@@ -58,10 +59,11 @@ class Tracker:
         username = user['username']
         if username not in self.usernames:
             id_ = user['id']
-            self.users.append(User(username, id_, []))
+            self.users.append(User(username, id_, [], []))
             self.usernames.append(username)
+            return f"Account {username} added"
         else:
-            return
+            return f"{username} is already added"
 
     def delete_user(self, user: User):
         print(self.usernames)
@@ -69,14 +71,21 @@ class Tracker:
         if username in self.usernames:
             self.users.remove(user)
             self.usernames.remove(username)
+            return f"Account {username} removed"
         else:
-            return
+            return f"Account {username} is not tracked"
 
     @staticmethod
     def get_user_follows(user: User):
+        print(user, 'asdad')
         try:
             user_follows_url = f"https://api.twitter.com/2/users/{user.id}/following?max_results=1000"
             user.follows = requests.get(user_follows_url, headers={"Authorization": f"Bearer {BEARER}"}).json()['data']
+            print(user.follows)
+            user.follows_usernames = []
+            for follow in user.follows:
+                user.follows_usernames.append(follow['username'])
         except KeyError:
             return f'User {user.username} does not exist'
-        return
+        return 'Follows are tracked now'
+

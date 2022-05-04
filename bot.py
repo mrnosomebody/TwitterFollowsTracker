@@ -14,6 +14,8 @@ def start(message):
     keyboard = [
         types.KeyboardButton("Add accounts"),
         types.KeyboardButton("Show accounts list"),
+        types.KeyboardButton("Remove accounts"),
+        types.KeyboardButton("Show difference"),
     ]
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     for i in keyboard:
@@ -33,6 +35,8 @@ def menu_actions_distributor(message):
                          f"<b>Insert twitter usernames you want to stop tracking</b>",
                          parse_mode='html')
         bot.register_next_step_handler(message, remove_accounts)
+    if message.text == 'Show difference':
+        compare_follows(message)
     if message.text == 'Show accounts list':
         show_added_accounts(message)
 
@@ -59,6 +63,18 @@ def remove_accounts(message):
     print(bot_users[message.from_user.id].users)
 
 
+def compare_follows(message):
+    for user in bot_users[message.from_user.id].users:
+        old_follows = set(user.follows_usernames)
+        bot_users[message.from_user.id].get_user_follows(user)
+        new_follows = set(user.follows_usernames)
+        followed = new_follows.difference(old_follows)
+        unfollowed = old_follows.difference(new_follows)
+
+        bot.send_message(message.from_user.id,
+                         text=f"{user.username} followed: {followed or None}, unfollowed: {unfollowed or None}")
+
+
 def show_added_accounts(message):
     bot.send_message(message.from_user.id, text=','.join(bot_users[message.from_user.id].usernames))
 
@@ -66,4 +82,3 @@ def show_added_accounts(message):
 def normalize_input(user_input: list):
     for i in range(len(user_input)):
         user_input[i] = user_input[i].strip()
-
