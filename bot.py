@@ -51,7 +51,7 @@ def add_accounts(message):
         bot_users[message.from_user.id].get_users(user_input)
         for user in bot_users[message.from_user.id].users:
             bot_users[message.from_user.id].get_user_follows(user)
-    print(bot_users[message.from_user.id].users)
+    bot.send_message(message.from_user.id, "Accounts were added, check the list to make sure")
 
 
 def remove_accounts(message):
@@ -60,7 +60,7 @@ def remove_accounts(message):
     for user in bot_users[message.from_user.id].users:
         if user.username in user_input:
             bot_users[message.from_user.id].delete_user(user)
-    print(bot_users[message.from_user.id].users)
+    bot.send_message(message.from_user.id, "Accounts were deleted, check the list to make sure")
 
 
 def compare_follows(message):
@@ -70,7 +70,6 @@ def compare_follows(message):
         new_follows = set(user.follows_usernames)
         followed = new_follows.difference(old_follows)
         unfollowed = old_follows.difference(new_follows)
-
         bot.send_message(message.from_user.id,
                          text=f"{user.username} followed: {followed or None}, unfollowed: {unfollowed or None}")
 
